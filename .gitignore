@@ -1,0 +1,16 @@
+# Ignorar archivos de modelos pesados
+*.pt
+
+# Ignorar entorno virtual
+.venv/
+venv/
+
+# Ignorar archivos temporales
+__pycache__/
+*.pyc
+*.pyo
+*.log
+
+# Ignorar configuraciones locales
+.DS_Store
+*.env
