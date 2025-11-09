@@ -1,0 +1,12 @@
+﻿timestamp,hora,dia,dia_num,lugar,Tráfico muy intenso,Tráfico moderado,Tráfico denso,Tráfico ligero,Sin tráfico
+2025-10-27T07:15:03-05:00,07:15,Lunes,0,javier prado,True,False,False,False,0
+2025-10-27T14:29:52-05:00,14:29,Lunes,0,javier prado,False,True,False,False,0
+2025-10-29T06:54:42-05:00,06:54,Miã©rcoles,2,javier prado,False,False,True,False,0
+2025-10-29T14:56:13-05:00,14:56,Miã©rcoles,2,javier prado,False,False,True,False,0
+2025-10-30T06:54:25-05:00,06:54,Jueves,3,javier prado,True,False,False,False,0
+2025-10-30T15:31:18-05:00,15:31,Jueves,3,javier prado,False,False,True,False,0
+2025-10-30T16:12:49-05:00,16:12,Jueves,3,javier prado,False,False,True,False,0
+2025-10-31T06:30:42-05:00,06:30,Viernes,4,javier prado,False,False,False,True,0
+2025-10-31T06:36:19-05:00,06:36,Viernes,4,javier prado,False,True,False,False,0
+2025-10-31T15:18:05-05:00,15:18,Viernes,4,javier prado,True,False,False,False,0
+2025-10-31T17:03:50-05:00,17:03,Viernes,4,javier prado,True,False,False,False,0

@@ -1,0 +1,12 @@
+timestamp,hora,dia,dia_num,lugar,Tráfico muy intenso,Tráfico moderado,Tráfico denso,Tráfico ligero,Sin tráfico
+2025-10-27 07:15:03-05:00,07:15,Monday,0,javier prado,1,0,0,0,0
+2025-10-27 14:29:52-05:00,14:29,Monday,0,javier prado,0,1,0,0,0
+2025-10-29 06:54:42-05:00,06:54,Wednesday,2,javier prado,0,0,1,0,0
+2025-10-29 14:56:13-05:00,14:56,Wednesday,2,javier prado,0,0,1,0,0
+2025-10-30 06:54:25-05:00,06:54,Thursday,3,javier prado,1,0,0,0,0
+2025-10-30 15:31:18-05:00,15:31,Thursday,3,javier prado,0,0,1,0,0
+2025-10-30 16:12:49-05:00,16:12,Thursday,3,javier prado,0,0,1,0,0
+2025-10-31 06:30:42-05:00,06:30,Friday,4,javier prado,0,0,0,1,0
+2025-10-31 06:36:19-05:00,06:36,Friday,4,javier prado,0,1,0,0,0
+2025-10-31 15:18:05-05:00,15:18,Friday,4,javier prado,1,0,0,0,0
+2025-10-31 17:03:50-05:00,17:03,Friday,4,javier prado,1,0,0,0,0
