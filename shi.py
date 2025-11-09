@@ -28,7 +28,8 @@ detection_model = AutoDetectionModel.from_pretrained(
     confidence_threshold=CONFIDENCE_THRESHOLD,
     device="cuda:0" if torch.cuda.is_available() else "cpu"
 )
-print("✅ Modelo YOLO11x cargado correctamente con SAHI.")
+print("✅ Modelo YOLO11x cargado correctamente con SAHI.")git commit -m "Migrando proyecto antiguo a nuevo repositorio"
+
 
 # ===== INICIALIZAR DeepSORT =====
 cfg = get_config()

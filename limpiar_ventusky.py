@@ -1,49 +1,84 @@
 import json
+import csv
 from datetime import datetime
 from itertools import groupby
-###  hay un unico registro por cada timestamp que encuentre
+import re
 
+def filtrar_ventusky(input_path: str, output_path: str, lugar: str = "javier prado"):
+    """
+    Filtra registros de Ventusky, deja uno por timestamp y limpia los campos numéricos.
+    Exporta un CSV similar al formato de Waze, con hora tomada del timestamp (sin segundos).
+    """
 
-# === 1. Cargar la data ===
-with open("data/ventusky_data.json", "r", encoding="utf-8") as f:
-    data = json.load(f)
+    # === 1. Cargar la data ===
+    with open(input_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
 
-# === 2. Mapeo de días en español a weekday (0=lunes ... 6=domingo) ===
-dias_map = {
-    "lunes": 0, "martes": 1, "miércoles": 2, "miercoles": 2,
-    "jueves": 3, "viernes": 4, "sábado": 5, "sabado": 5, "domingo": 6
-}
+    # === 2. Diccionario de días ===
+    dias_map = {
+        "monday": 0, "tuesday": 1, "wednesday": 2,
+        "thursday": 3, "friday": 4, "saturday": 5, "sunday": 6,
+        "lunes": 0, "martes": 1, "miércoles": 2, "miercoles": 2,
+        "jueves": 3, "viernes": 4, "sábado": 5, "sabado": 5, "domingo": 6
+    }
 
-# === 3. Ordenamos por timestamp (necesario para groupby) ===
-data.sort(key=lambda x: x["timestamp"])
+    # === 3. Ordenar por timestamp ===
+    data.sort(key=lambda x: x["timestamp"])
 
-# === 4. Agrupar por timestamp y quedarnos con el más cercano ===
-filtrados = []
+    filtrados = []
 
-for timestamp, grupo in groupby(data, key=lambda x: x["timestamp"]):
-    grupo = list(grupo)
-    ts = datetime.fromisoformat(timestamp)
-    dia_real = ts.weekday()
-    hora_scrap_min = ts.hour * 60 + ts.minute
+    for timestamp, grupo in groupby(data, key=lambda x: x["timestamp"]):
+        grupo = list(grupo)
+        ts = datetime.fromisoformat(timestamp)
+        dia_real = ts.weekday()
 
-    # Filtramos solo los que coinciden en día
-    grupo = [g for g in grupo if dias_map.get(g["dia"].lower(), -1) == dia_real]
+        grupo = [g for g in grupo if dias_map.get(g["dia"].lower(), -1) == dia_real]
+        if not grupo:
+            continue
 
-    if not grupo:
-        continue  # si ninguno coincide con el día, lo saltamos
+        mejor = grupo[0]  # ya que es el único por timestamp después del filtro
 
-    # Calcular diferencia entre hora del campo y hora del timestamp
-    for g in grupo:
-        hora_dato = datetime.strptime(g["hora"], "%H:%M")
-        hora_dato_min = hora_dato.hour * 60 + hora_dato.minute
-        g["diff"] = abs(hora_dato_min - hora_scrap_min)
+        # === extraer componentes ===
+        fecha = ts.strftime("%Y-%m-%d")
+        hora_str = ts.strftime("%H:%M")  # ✅ hora exacta del timestamp sin segundos
+        fecha_id = ts.strftime("%Y-%m-%d_%H-%M")
 
-    # Elegir el registro con la menor diferencia
-    mejor = min(grupo, key=lambda x: x["diff"])
-    filtrados.append(mejor)
+        # === limpiar valores numéricos ===
+        def extraer_num(texto):
+            if texto is None:
+                return ""
+            match = re.search(r"[-+]?\d*\.?\d+", str(texto))
+            return match.group(0) if match else ""
 
-# === 5. Guardar los resultados filtrados ===
-with open("data/ventusky_limpio.json", "w", encoding="utf-8") as f:
-    json.dump(filtrados, f, indent=4, ensure_ascii=False)
+        temperatura = extraer_num(mejor.get("temperatura", ""))
+        humedad = extraer_num(mejor.get("humedad", ""))
+        viento = extraer_num(mejor.get("viento", ""))
+        lluvia = extraer_num(mejor.get("lluvia", ""))
 
-print(f"✅ Registros finales: {len(filtrados)} guardados correctamente.")
+        dia_nombre = mejor.get("dia", "").lower()
+        dia_num = dias_map.get(dia_nombre, dia_real)
+
+        # === id único ===
+        id_unico = f"{lugar.lower().replace(' ', '_')}_{fecha_id}"
+
+        filtrados.append({
+            "id": id_unico,
+            "timestamp": timestamp,
+            "dia": dia_nombre,
+            "dia_num": dia_num,
+            "hora": hora_str,
+            "temperatura": temperatura,
+            "humedad": humedad,
+            "viento": viento,
+            "lluvia": lluvia,
+            "fecha": fecha
+        })
+
+    # === 5. Exportar CSV ===
+    columnas = ["id", "timestamp", "dia", "dia_num", "hora", "temperatura", "humedad", "viento", "lluvia", "fecha"]
+    with open(output_path, "w", newline="", encoding="utf-8-sig") as f:
+        writer = csv.DictWriter(f, fieldnames=columnas)
+        writer.writeheader()
+        writer.writerows(filtrados)
+
+    print(f"✅ {len(filtrados)} registros procesados correctamente en {output_path}")

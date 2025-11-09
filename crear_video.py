@@ -3,7 +3,7 @@ import os
 import natsort
 
 # Ruta de la carpeta con las imágenes
-folder_path = r"D:\Proyectos\deepsort\YOLOv8-DeepSORT-Object-Tracking\ultralytics\yolo\v8\detect\estela"
+folder_path = r"D:\Proyectos\DEEPSORT_V2\data"
 
 # Obtener lista de archivos de imagen y ordenarlos naturalmente
 images = [img for img in os.listdir(folder_path) if img.endswith(".png")]
