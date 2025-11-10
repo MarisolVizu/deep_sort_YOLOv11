@@ -4,9 +4,9 @@ from datetime import datetime
 from itertools import groupby
 import re
 
-def filtrar_ventusky(input_path: str, output_path: str, lugar: str = "javier prado"):
+def filtrar_ventusky(input_path: str, output_path: str):
     """
-    Filtra registros de Ventusky, deja uno por timestamp y limpia los campos numéricos.
+    Filtra registros de Ventusky agrupando por ID, deja uno por ID y limpia los campos numéricos.
     Exporta un CSV similar al formato de Waze, con hora tomada del timestamp (sin segundos).
     """
 
@@ -22,26 +22,38 @@ def filtrar_ventusky(input_path: str, output_path: str, lugar: str = "javier pra
         "jueves": 3, "viernes": 4, "sábado": 5, "sabado": 5, "domingo": 6
     }
 
-    # === 3. Ordenar por timestamp ===
-    data.sort(key=lambda x: x["timestamp"])
+    # === 3. Ordenar por id ===
+    data.sort(key=lambda x: x["id"])
 
     filtrados = []
 
-    for timestamp, grupo in groupby(data, key=lambda x: x["timestamp"]):
+    for id_val, grupo in groupby(data, key=lambda x: x["id"]):
         grupo = list(grupo)
-        ts = datetime.fromisoformat(timestamp)
-        dia_real = ts.weekday()
+        mejor = None
 
-        grupo = [g for g in grupo if dias_map.get(g["dia"].lower(), -1) == dia_real]
-        if not grupo:
-            continue
+        # === Buscar el mejor registro ===
+        for g in grupo:
+            try:
+                ts = datetime.fromisoformat(g["timestamp"])
+                dia_real = ts.weekday()
+                dia_nombre = g.get("dia", "").lower()
+                if dias_map.get(dia_nombre, -1) == dia_real:
+                    mejor = g
+                    break  # si coincide el día, tomamos este
+            except Exception:
+                continue
 
-        mejor = grupo[0]  # ya que es el único por timestamp después del filtro
+        # Si no se encontró coincidencia, tomar el primero
+        if mejor is None:
+            mejor = grupo[0]
+            try:
+                ts = datetime.fromisoformat(mejor["timestamp"])
+            except Exception:
+                continue
 
         # === extraer componentes ===
         fecha = ts.strftime("%Y-%m-%d")
-        hora_str = ts.strftime("%H:%M")  # ✅ hora exacta del timestamp sin segundos
-        fecha_id = ts.strftime("%Y-%m-%d_%H-%M")
+        hora_str = ts.strftime("%H:%M")  # hora exacta del timestamp sin segundos
 
         # === limpiar valores numéricos ===
         def extraer_num(texto):
@@ -56,14 +68,12 @@ def filtrar_ventusky(input_path: str, output_path: str, lugar: str = "javier pra
         lluvia = extraer_num(mejor.get("lluvia", ""))
 
         dia_nombre = mejor.get("dia", "").lower()
-        dia_num = dias_map.get(dia_nombre, dia_real)
+        dia_num = dias_map.get(dia_nombre, ts.weekday())
 
-        # === id único ===
-        id_unico = f"{lugar.lower().replace(' ', '_')}_{fecha_id}"
-
+        # === Usar el ID original ===
         filtrados.append({
-            "id": id_unico,
-            "timestamp": timestamp,
+            "id": mejor["id"],
+            "timestamp": mejor["timestamp"],
             "dia": dia_nombre,
             "dia_num": dia_num,
             "hora": hora_str,

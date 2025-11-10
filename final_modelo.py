@@ -13,7 +13,7 @@ def tracking_autos(
     images_folder: str,
     video_output: str = None,
     csv_output: str = "tracking_autos.csv",
-    model_path: str = "yolo11x.pt",
+    model_path: str = "yolo11n.pt",
     conf_threshold: float = 0.1,
     image_size: int = 1280,
     fps_output: int = 30
